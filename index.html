@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Урок: Циклы for в Python | EduBlocks to Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius: 16px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            padding: 6px 16px;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        /* GRID */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .card-exercises::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .card-loopgame::before { background: linear-gradient(90deg, #10b981, #06b6d4); }
+        .card-gravity::before { background: linear-gradient(90deg, #f59e0b, #ec4899); }
+
+        .module-card:hover {
+            transform: translateY(-6px);
+            border-color: #475569;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #fff;
+        }
+
+        .card-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+            flex-grow: 1;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 24px;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .card-features li {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-launch {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 12px 20px;
+            border-radius: 10px;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn-launch:hover {
+            background: var(--primary-hover);
+            transform: scale(1.02);
+        }
+
+        /* BRIDGE SECTION: EduBlocks to Python */
+        .edublocks-bridge {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin-bottom: 48px;
+        }
+
+        .edublocks-bridge h2 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .compare-box {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 18px;
+        }
+
+        .compare-box h3 {
+            font-size: 0.95rem;
+            color: #818cf8;
+            margin-bottom: 10px;
+        }
+
+        .code-snippet {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            background: #1e293b;
+            padding: 10px 14px;
+            border-radius: 8px;
+            color: #a5f3fc;
+            overflow-x: auto;
+        }
+
+        /* TEACHER'S TIP */
+        .teacher-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 40px;
+        }
+
+        .teacher-box h3 {
+            color: #c084fc;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .teacher-box ol {
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .teacher-box ol li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 24px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid #1e293b;
+        }
+
+        @media (max-width: 640px) {
+            h1 { font-size: 2.1rem; }
+            .container { padding: 24px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="hero">
+        <span class="badge">EduBlocks ➔ Python Text</span>
+        <h1>Циклы for i in range()</h1>
+        <p class="subtitle">Интерактивный учебный комплекс для урока программирования: шпаргалки, 12 практических задач, игра-тренажёр на понимание кода и физическая космо-игра для разгрузки и кругозора.</p>
+    </header>
+
+    <!-- ТРИ ОСНОВНЫХ МОДУЛЯ -->
+    <div class="modules-grid">
+        <!-- 1. Задания -->
+        <div class="module-card card-exercises">
+            <div>
+                <div class="card-icon">📝</div>
+                <h2 class="card-title">12 Практических Заданий</h2>
+                <p class="card-desc">Пошаговый задачник от самых первых шагов с циклом до алгоритмов факториала, вложенных условий и треугольников из звёздочек.</p>
+                <ul class="card-features">
+                    <li>⭐ 4 уровня нарастающей сложности</li>
+                    <li>💡 Скрытые подсказки по клику</li>
+                    <li>🔑 Готовые решения на Python</li>
+                    <li>🖥️ Ожидаемый вывод каждого задания</li>
+                </ul>
+            </div>
+            <a href="exercises.html" class="btn-launch">Открыть Задания →</a>
+        </div>
+
+        <!-- 2. Игра-тренажёр -->
+        <div class="module-card card-loopgame">
+            <div>
+                <div class="card-icon">🔄</div>
+                <h2 class="card-title">Тренажёр «Цикломат»</h2>
+                <p class="card-desc">Интерактивная игра-викторина. Ученик видит код с циклом и должен предсказать его вывод. Пошаговая трассировка выполнения строк!</p>
+                <ul class="card-features">
+                    <li>🕹️ Лёгкий, средний и сложный уровни</li>
+                    <li>❤️ Система жизней, комбо и очков</li>
+                    <li>✨ Пошаговая подсветка строк кода</li>
+                    <li>🎉 Конфетти и статистика в конце</li>
+                </ul>
+            </div>
+            <a href="loop-game.html" class="btn-launch" style="background: #059669;">Запустить Цикломат →</a>
+        </div>
+
+        <!-- 3. Физическая игра -->
+        <div class="module-card card-gravity">
+            <div>
+                <div class="card-icon">🌌</div>
+                <h2 class="card-title">«Гравитационный Гольф»</h2>
+                <p class="card-desc">Игра на космическую физику. Мяч летит мимо планет по закону всемирного тяготения. Показывает, как симуляция физики в играх работает как цикл!</p>
+                <ul class="card-features">
+                    <li>🪐 8 уровней с гравитационными рогатками</li>
+                    <li>📐 Предсказание траектории полета</li>
+                    <li>🔬 Реальные научные факты о космосе</li>
+                    <li>🐍 Просмотр Python-кода симуляции</li>
+                </ul>
+            </div>
+            <a href="gravity-golf.html" class="btn-launch" style="background: #d97706;">Играть в Гольф →</a>
+        </div>
+    </div>
+
+    <!-- МОСТ: ИЗ EDUBLOCKS В ТЕКСТОВЫЙ PYTHON -->
+    <div class="edublocks-bridge">
+        <h2>🧱 Шпаргалка: Блоки EduBlocks → Текстовый код Python</h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">Ученики привыкли к блокам в EduBlocks. Вот как знакомые визуальные конструкции переводятся в текстовый синтаксис:</p>
+        
+        <div class="comparison-grid">
+            <div class="compare-box">
+                <h3>1. Повторить N раз</h3>
+                <p style="font-size: 0.85rem; color:#94a3b8; margin-bottom: 8px;">Блок «repeat 5 times»</p>
+                <div class="code-snippet">
+<span style="color:#c084fc;">for</span> i <span style="color:#c084fc;">in</span> <span style="color:#38bdf8;">range</span>(<span style="color:#f43f5e;">5</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">print</span>(<span style="color:#4ade80;">"Привет"</span>)
+                </div>
+            </div>
+
+            <div class="compare-box">
+                <h3>2. Числа от Start до Stop</h3>
+                <p style="font-size: 0.85rem; color:#94a3b8; margin-bottom: 8px;">Блок диапазона с началом</p>
+                <div class="code-snippet">
+<span style="color:#c084fc;">for</span> i <span style="color:#c084fc;">in</span> <span style="color:#38bdf8;">range</span>(<span style="color:#f43f5e;">1</span>, <span style="color:#f43f5e;">11</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">print</span>(i)  <span style="color:#64748b;"># 1 .. 10</span>
+                </div>
+            </div>
+
+            <div class="compare-box">
+                <h3>3. Счёт с шагом (Step)</h3>
+                <p style="font-size: 0.85rem; color:#94a3b8; margin-bottom: 8px;">Чётные числа или обратный счёт</p>
+                <div class="code-snippet">
+<span style="color:#c084fc;">for</span> i <span style="color:#c084fc;">in</span> <span style="color:#38bdf8;">range</span>(<span style="color:#f43f5e;">10</span>, <span style="color:#f43f5e;">0</span>, <span style="color:#f43f5e;">-1</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#38bdf8;">print</span>(i)  <span style="color:#64748b;"># 10, 9.. 1</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- СОВЕТЫ ДЛЯ ПРЕПОДАВАТЕЛЯ -->
+    <div class="teacher-box">
+        <h3>🧑‍🏫 Рекомендуемый план урока (45–60 минут)</h3>
+        <ol>
+            <li><strong>5-7 мин:</strong> Разбор концепции <code>range()</code> через шпаргалку на этой странице (обсудить, почему <code>range(5)</code> заканчивается на 4, а не на 5).</li>
+            <li><strong>20-25 мин:</strong> Самостоятельное или парное решение карточек в <a href="exercises.html" style="color:#818cf8;">Задачнике</a> (задания 1–6 обязательны, 7–12 для продвинутых).</li>
+            <li><strong>10 мин:</strong> Закрепление в игре <a href="loop-game.html" style="color:#34d399;">«Цикломат»</a> (соревновательный элемент: кто наберет больше очков без потери жизней).</li>
+            <li><strong>5-10 мин:</strong> Разгрузка в <a href="gravity-golf.html" style="color:#fbbf24;">«Гравитационном Гольфе»</a> — посмотреть код симуляции и увидеть, как математический цикл <code>for step in range(1000)</code> управляет полётом космического корабля в реальных видеоиграх!</li>
+        </ol>
+    </div>
+</div>
+
+<footer>
+    <p>🐍 Проект для занятий по Python для школьников • Все файлы работают локально без интернета</p>
+</footer>
+
+</body>
+</html>

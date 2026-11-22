@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔄 Цикломат — Тренажёр циклов for</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0d1117;
+  --bg2: #161b22;
+  --bg3: #1c2333;
+  --surface: #21262d;
+  --border: #30363d;
+  --text: #e6edf3;
+  --text2: #8b949e;
+  --accent: #58a6ff;
+  --purple: #d2a8ff;
+  --orange: #ffa657;
+  --green: #7ee787;
+  --blue: #79c0ff;
+  --red: #ff7b72;
+  --yellow: #e3b341;
+  --pink: #f778ba;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== PARTICLES ===== */
+#particles-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+}
+
+/* ===== SCREENS ===== */
+.screen {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.screen.active { display: flex; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+.shake { animation: shake 0.5s ease; }
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 5px var(--accent), 0 0 10px transparent; }
+  50% { box-shadow: 0 0 15px var(--accent), 0 0 30px rgba(88,166,255,0.3); }
+}
+
+/* ===== START SCREEN ===== */
+#start-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.logo {
+  font-size: 4rem;
+  margin-bottom: -0.5rem;
+  animation: popIn 0.6s ease;
+}
+
+#start-screen h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: popIn 0.6s ease 0.1s both;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  color: var(--text2);
+  max-width: 500px;
+  line-height: 1.6;
+  animation: slideUp 0.5s ease 0.2s both;
+}
+
+.level-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 420px;
+  margin-top: 1rem;
+  animation: slideUp 0.5s ease 0.3s both;
+}
+
+.level-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  overflow: hidden;
+}
+
+.level-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  transition: width 0.3s ease;
+}
+
+.level-btn[data-level="1"]::before { background: var(--green); }
+.level-btn[data-level="2"]::before { background: var(--orange); }
+.level-btn[data-level="3"]::before { background: var(--red); }
+
+.level-btn:hover {
+  border-color: var(--accent);
+  transform: translateX(6px);
+  background: var(--bg3);
+}
+.level-btn:hover::before { width: 6px; }
+
+.level-btn .level-icon { font-size: 1.8rem; }
+
+.level-btn .level-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.level-btn .level-info span:last-child {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text2);
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.95rem;
+  transition: color 0.2s;
+  animation: slideUp 0.5s ease 0.4s both;
+}
+.back-link:hover { color: var(--accent); }
+
+/* ===== GAME SCREEN ===== */
+#game-screen {
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Top bar */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.btn-back-game {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  transition: var(--transition);
+}
+.btn-back-game:hover { border-color: var(--accent); color: var(--text); }
+
+.level-badge {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  color: #fff;
+}
+.level-badge.l1 { background: linear-gradient(135deg, #238636, #2ea043); }
+.level-badge.l2 { background: linear-gradient(135deg, #9e6a03, #bb8009); }
+.level-badge.l3 { background: linear-gradient(135deg, #da3633, #f85149); }
+
+.question-counter {
+  font-size: 0.9rem;
+  color: var(--text2);
+}
+
+.top-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.lives {
+  font-size: 1.3rem;
+  display: flex;
+  gap: 0.3rem;
+}
+.lives .heart { transition: var(--transition); }
+.lives .heart.lost { opacity: 0.2; filter: grayscale(1); transform: scale(0.8); }
+
+.score-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--yellow);
+}
+
+.multiplier {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  background: rgba(88,166,255,0.15);
+  color: var(--accent);
+  transition: var(--transition);
+}
+.multiplier.high {
+  background: rgba(210,168,255,0.2);
+  color: var(--purple);
+  animation: pulse 0.6s ease;
+}
+
+/* Progress bar */
+.progress-container {
+  width: 100%;
+  height: 4px;
+  background: var(--bg3);
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--purple));
+  transition: width 0.5s ease;
+  border-radius: 0 2px 2px 0;
+}
+
+/* Game content */
+.game-content {
+  flex: 1;
+  display: flex;
+  padding: 1.5rem;
+  gap: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (max-width: 800px) {
+  .game-content { flex-direction: column; }
+}
+
+/* Code panel */
+.code-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.code-window {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.code-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.code-dots {
+  display: flex;
+  gap: 6px;
+}
+.code-dots span {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+}
+.code-dots span:nth-child(1) { background: #ff5f57; }
+.code-dots span:nth-child(2) { background: #febc2e; }
+.code-dots span:nth-child(3) { background: #28c840; }
+
+.code-filename {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-left: 0.5rem;
+}
+
+.code-body {
+  padding: 1rem 0;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  overflow-x: auto;
+}
+
+.code-line {
+  display: flex;
+  padding: 2px 1rem;
+  transition: background 0.2s;
+}
+
+.code-line.highlight {
+  background: rgba(88,166,255,0.1);
+  border-left: 3px solid var(--accent);
+  padding-left: calc(1rem - 3px);
+}
+
+.line-number {
+  color: var(--text2);
+  min-width: 2.5rem;
+  user-select: none;
+  opacity: 0.5;
+  text-align: right;
+  padding-right: 1rem;
+}
+
+.line-content { flex: 1; }
+
+/* Syntax colors */
+.kw { color: var(--purple); font-weight: 700; }
+.fn { color: var(--blue); }
+.num { color: var(--orange); }
+.str { color: var(--green); }
+.op { color: var(--red); }
+.cm { color: var(--text2); font-style: italic; }
+.var { color: var(--text); }
+
+/* Variables panel */
+.vars-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  display: none;
+}
+
+.vars-panel.visible { display: block; }
+
+.vars-title {
+  font-size: 0.8rem;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 0.6rem;
+}
+
+.vars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.var-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  padding: 0.3rem 0.5rem;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  animation: popIn 0.3s ease;
+}
+
+.var-name { color: var(--accent); }
+.var-eq { color: var(--text2); }
+.var-val { color: var(--orange); font-weight: 700; }
+
+/* Console output */
+.console-panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: none;
+}
+
+.console-panel.visible { display: block; }
+
+.console-titlebar {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+
+.console-body {
+  padding: 0.8rem 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  min-height: 2rem;
+  color: var(--green);
+}
+
+.console-line {
+  animation: slideUp 0.2s ease;
+}
+
+/* Answer panel */
+.answer-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.question-text {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.question-text .emoji {
+  font-size: 1.3rem;
+  margin-right: 0.3rem;
+}
+
+/* Multiple choice */
+.choices-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.choice-btn {
+  display: block;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: left;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.choice-btn:hover:not(.disabled) {
+  border-color: var(--accent);
+  background: var(--bg3);
+  transform: translateX(4px);
+}
+
+.choice-btn.correct {
+  border-color: var(--green);
+  background: rgba(126,231,135,0.1);
+}
+
+.choice-btn.wrong {
+  border-color: var(--red);
+  background: rgba(255,123,114,0.1);
+}
+
+.choice-btn.disabled { cursor: default; opacity: 0.6; pointer-events: none; }
+
+/* Text input */
+.input-container { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.answer-textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 1rem;
+  background: var(--bg2);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.95rem;
+  resize: vertical;
+  line-height: 1.6;
+  transition: border-color 0.2s;
+}
+
+.answer-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  animation: glowPulse 2s ease infinite;
+}
+
+.answer-textarea::placeholder { color: var(--text2); opacity: 0.5; }
+
+.input-hint {
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+
+.btn-submit {
+  padding: 0.9rem 2rem;
+  background: linear-gradient(135deg, var(--accent), #388bfd);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(88,166,255,0.4); }
+.btn-submit:disabled { opacity: 0.5; cursor: default; transform: none; box-shadow: none; }
+
+/* Feedback */
+.feedback-area {
+  display: none;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: slideUp 0.4s ease;
+}
+
+.feedback-area.visible {
+  display: flex;
+}
+
+.feedback-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.feedback-banner.correct {
+  background: rgba(126,231,135,0.1);
+  border: 1px solid rgba(126,231,135,0.3);
+  color: var(--green);
+}
+
+.feedback-banner.wrong {
+  background: rgba(255,123,114,0.1);
+  border: 1px solid rgba(255,123,114,0.3);
+  color: var(--red);
+}
+
+.expected-output {
+  padding: 0.8rem 1rem;
+  background: var(--bg3);
+  border-radius: var(--radius-sm);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  border-left: 3px solid var(--green);
+}
+
+.expected-label {
+  font-size: 0.8rem;
+  color: var(--text2);
+  margin-bottom: 0.3rem;
+  font-family: 'Nunito', sans-serif;
+}
+
+.btn-next {
+  padding: 0.9rem 2rem;
+  background: linear-gradient(135deg, var(--purple), var(--pink));
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  align-self: flex-start;
+}
+
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(210,168,255,0.4); }
+
+/* ===== RESULTS SCREEN ===== */
+#results-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.results-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: var(--shadow);
+  animation: popIn 0.5s ease;
+}
+
+.results-title {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.results-stars {
+  font-size: 2.5rem;
+  margin: 1rem 0;
+}
+
+.results-stars .star { transition: var(--transition); }
+.results-stars .star.empty { opacity: 0.2; }
+
+.results-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--yellow);
+  margin: 0.5rem 0;
+}
+
+.results-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1.2rem 0;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+.stat-value.correct-val { color: var(--green); }
+.stat-value.wrong-val { color: var(--red); }
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text2);
+}
+
+.results-message {
+  font-size: 1rem;
+  color: var(--text2);
+  line-height: 1.5;
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+
+.results-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.btn-restart {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-restart:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(88,166,255,0.4); }
+
+.btn-other-level {
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-other-level:hover { border-color: var(--accent); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  #start-screen h1 { font-size: 2rem; }
+  .logo { font-size: 3rem; }
+  .subtitle { font-size: 1rem; }
+  .game-content { padding: 1rem; }
+  .top-bar { padding: 0.75rem 1rem; }
+  .code-body { font-size: 0.82rem; }
+  .results-card { padding: 1.5rem; }
+  .results-stats { gap: 1.2rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+
+<!-- ===== START SCREEN ===== -->
+<div id="start-screen" class="screen active">
+  <div class="logo">🔄</div>
+  <h1>Цикломат</h1>
+  <p class="subtitle">Тренажёр циклов <code style="background:var(--bg3);padding:0.15em 0.4em;border-radius:4px;font-family:'JetBrains Mono',monospace;color:var(--purple);">for i in range()</code> в Python.<br>Предскажи, что выведет программа!</p>
+  <div class="level-buttons">
+    <button class="level-btn" data-level="1" onclick="startGame(1)">
+      <span class="level-icon">🟢</span>
+      <div class="level-info">
+        <span>Уровень 1 — Лёгкий</span>
+        <span>range(n), range(start, stop) · 5 вопросов · выбор из вариантов</span>
+      </div>
+    </button>
+    <button class="level-btn" data-level="2" onclick="startGame(2)">
+      <span class="level-icon">🟠</span>
+      <div class="level-info">
+        <span>Уровень 2 — Средний</span>
+        <span>range(start, stop, step), вычисления · 5 вопросов · ввод ответа</span>
+      </div>
+    </button>
+    <button class="level-btn" data-level="3" onclick="startGame(3)">
+      <span class="level-icon">🔴</span>
+      <div class="level-info">
+        <span>Уровень 3 — Сложный</span>
+        <span>Накопление, условия, строки · 5 вопросов · ввод ответа</span>
+      </div>
+    </button>
+  </div>
+  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;">
+    <a href="index.html" class="back-link">🏠 Главное меню</a>
+    <a href="exercises.html" class="back-link">📝 12 Заданий</a>
+    <a href="gravity-golf.html" class="back-link">🌌 Гравитационный Гольф</a>
+  </div>
+</div>
+
+<!-- ===== GAME SCREEN ===== -->
+<div id="game-screen" class="screen">
+  <div class="top-bar">
+    <div class="top-left">
+      <button class="btn-back-game" onclick="showScreen('start-screen')">← Меню</button>
+      <span class="level-badge" id="level-badge">Уровень 1</span>
+      <span class="question-counter" id="question-counter">1 / 5</span>
+    </div>
+    <div class="top-right">
+      <div class="lives" id="lives">
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+        <span class="heart">❤️</span>
+      </div>
+      <span class="multiplier" id="multiplier">×1</span>
+      <span class="score-display" id="score-display">0</span>
+    </div>
+  </div>
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+  </div>
+  <div class="game-content" id="game-content">
+    <div class="code-panel" id="code-panel">
+      <div class="code-window" id="code-window">
+        <div class="code-titlebar">
+          <div class="code-dots"><span></span><span></span><span></span></div>
+          <span class="code-filename">задание.py</span>
+        </div>
+        <div class="code-body" id="code-body"></div>
+      </div>
+      <div class="vars-panel" id="vars-panel">
+        <div class="vars-title">📌 Переменные</div>
+        <div class="vars-list" id="vars-list"></div>
+      </div>
+      <div class="console-panel" id="console-panel">
+        <div class="console-titlebar">▶ Вывод программы (Консоль)</div>
+        <div class="console-body" id="console-body"></div>
+      </div>
+    </div>
+    <div class="answer-panel" id="answer-panel">
+      <div class="question-text" id="question-text">
+        <span class="emoji">🤔</span> Что выведет эта программа?
+      </div>
+      <div id="answer-area"></div>
+      <div class="feedback-area" id="feedback-area">
+        <div class="feedback-banner" id="feedback-banner"></div>
+        <div id="feedback-expected"></div>
+        <button class="btn-next" id="btn-next" onclick="nextQuestion()">Далее →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="results-screen" class="screen">
+  <div class="results-card">
+    <div class="results-title" id="results-title">🏆 Игра окончена!</div>
+    <div class="results-stars" id="results-stars"></div>
+    <div class="results-score" id="results-score">0</div>
+    <div class="results-stats">
+      <div class="stat-item">
+        <span class="stat-value correct-val" id="stat-correct">0</span>
+        <span class="stat-label">Верно ✅</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value wrong-val" id="stat-wrong">0</span>
+        <span class="stat-label">Ошибок ❌</span>
+      </div>
+    </div>
+    <div class="results-message" id="results-message"></div>
+    <div class="results-buttons">
+      <button class="btn-restart" id="btn-replay" onclick="startGame(currentLevel)">🔁 Играть ещё раз</button>
+      <button class="btn-other-level" onclick="showScreen('start-screen')">🎚️ Выбрать другой уровень</button>
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:0.5rem;">
+        <a href="index.html" class="back-link">🏠 Главное меню</a>
+        <a href="exercises.html" class="back-link">📝 12 Заданий</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =============================================
+// GAME STATE
+// =============================================
+let currentLevel = 1;
+let currentQuestion = 0;
+let questions = [];
+let score = 0;
+let lives = 3;
+let streak = 0;
+let multiplier = 1;
+let correctCount = 0;
+let wrongCount = 0;
+let answered = false;
+const TOTAL_QUESTIONS = 5;
+
+// =============================================
+// PARTICLES
+// =============================================
+const canvas = document.getElementById('particles-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+class Particle {
+  constructor(x, y, color) {
+    this.x = x; this.y = y;
+    this.color = color;
+    this.size = Math.random() * 6 + 3;
+    this.vx = (Math.random() - 0.5) * 12;
+    this.vy = (Math.random() - 0.5) * 12 - 4;
+    this.gravity = 0.3;
+    this.life = 1;
+    this.decay = Math.random() * 0.02 + 0.015;
+    this.rotation = Math.random() * Math.PI * 2;
+    this.rotSpeed = (Math.random() - 0.5) * 0.2;
+  }
+  update() {
+    this.vy += this.gravity;
+    this.x += this.vx;
+    this.y += this.vy;
+    this.life -= this.decay;
+    this.rotation += this.rotSpeed;
+    this.vx *= 0.99;
+  }
+  draw() {
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rotation);
+    ctx.globalAlpha = this.life;
+    ctx.fillStyle = this.color;
+    ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+    ctx.restore();
+  }
+}
+
+function spawnConfetti(x, y) {
+  const colors = ['#7ee787', '#58a6ff', '#d2a8ff', '#ffa657', '#f778ba', '#e3b341', '#ff7b72', '#79c0ff'];
+  for (let i = 0; i < 50; i++) {
+    particles.push(new Particle(x, y, colors[Math.floor(Math.random() * colors.length)]));
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => { p.update(); p.draw(); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+
+// =============================================
+// QUESTION TEMPLATES
+// =============================================
+
+function randInt(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function rangeArr(start, stop, step) {
+  const r = [];
+  if (step === undefined) step = 1;
+  if (step > 0) { for (let i = start; i < stop; i += step) r.push(i); }
+  else { for (let i = start; i > stop; i += step) r.push(i); }
+  return r;
+}
+
+// ----------- LEVEL 1 Templates -----------
+const level1Templates = [
+  // 1. Simple range(n) print i
+  () => {
+    const n = randInt(3, 7);
+    const output = rangeArr(0, n).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):`, indent: 0 },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)`, indent: 1 }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 2. range(n) print string
+  () => {
+    const n = randInt(2, 5);
+    const words = ['Привет', 'Ура', 'Python', 'Класс', 'Цикл', 'Код', 'Йо'];
+    const w = words[randInt(0, words.length - 1)];
+    const output = Array(n).fill(w).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print("${w}")`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap(`"${w}"`, 'str')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: w }
+      ])
+    };
+  },
+  // 3. range(start, stop) print i
+  () => {
+    const a = randInt(1, 5);
+    const b = a + randInt(3, 6);
+    const output = rangeArr(a, b).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 4. range(n) print i + 1
+  () => {
+    const n = randInt(3, 6);
+    const output = rangeArr(0, n).map(i => i + 1).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(i + 1)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">+</span> ${wrap(1, 'num')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i + 1) }
+      ])
+    };
+  },
+  // 5. range(n) print("text", i)
+  () => {
+    const n = randInt(3, 5);
+    const output = rangeArr(0, n).map(i => `Шаг ${i}`).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print("Шаг", i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap('"Шаг"', 'str')}, <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: `Шаг ${i}` }
+      ])
+    };
+  },
+  // 6. range(start, stop) print start..stop-1
+  () => {
+    const a = randInt(3, 8);
+    const b = a + randInt(2, 5);
+    const output = rangeArr(a, b).join('\n');
+    return {
+      code: `for x in range(${a}, ${b}):\n    print(x)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">x</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">x</span>)` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { x: i } },
+        { line: 1, vars: { x: i }, prints: String(i) }
+      ])
+    };
+  },
+  // 7. range(1, n+1) print i
+  () => {
+    const n = randInt(4, 7);
+    const output = rangeArr(1, n + 1).join('\n');
+    return {
+      code: `for i in range(1, ${n + 1}):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(n + 1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(1, n + 1).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 8. range(n) print string with i
+  () => {
+    const n = randInt(3, 5);
+    const output = rangeArr(0, n).map(i => `Число: ${i}`).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print("Число:", i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap('"Число:"', 'str')}, <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: `Число: ${i}` }
+      ])
+    };
+  },
+  // 9. range(n) with simple expression
+  () => {
+    const n = randInt(3, 5);
+    const output = rangeArr(0, n).map(i => i * 10).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(i * 10)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">*</span> ${wrap(10, 'num')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i * 10) }
+      ])
+    };
+  },
+  // 10. range(start, stop) print text
+  () => {
+    const a = randInt(0, 3);
+    const b = a + randInt(2, 4);
+    const output = rangeArr(a, b).map(i => `#${i}`).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    print("#" + str(i))`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap('"#"', 'str')} <span class="op">+</span> <span class="fn">str</span>(<span class="var">i</span>))` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: `#${i}` }
+      ])
+    };
+  },
+  // 11. range(n) print constant number
+  () => {
+    const n = randInt(2, 4);
+    const v = randInt(5, 20);
+    const output = Array(n).fill(String(v)).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(${v})`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap(v, 'num')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(v) }
+      ])
+    };
+  },
+  // 12. range(start, stop) print i - start
+  () => {
+    const a = randInt(5, 10);
+    const b = a + randInt(3, 5);
+    const sub = a;
+    const output = rangeArr(a, b).map(i => i - sub).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    print(i - ${sub})`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">-</span> ${wrap(sub, 'num')})` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i - sub) }
+      ])
+    };
+  }
+];
+
+// ----------- LEVEL 2 Templates -----------
+const level2Templates = [
+  // 1. range with step
+  () => {
+    const a = randInt(0, 2);
+    const b = randInt(10, 20);
+    const s = [2, 3, 5][randInt(0, 2)];
+    const output = rangeArr(a, b, s).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, ${s}):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(s, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b, s).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 2. Countdown
+  () => {
+    const a = randInt(5, 10);
+    const b = randInt(0, 2);
+    const output = rangeArr(a, b, -1).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, -1):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(-1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b, -1).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 3. Multiply inside loop
+  () => {
+    const a = randInt(1, 3);
+    const b = a + randInt(3, 5);
+    const m = [2, 3, 5][randInt(0, 2)];
+    const output = rangeArr(a, b).map(i => i * m).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    print(i * ${m})`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">*</span> ${wrap(m, 'num')})` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i * m) }
+      ])
+    };
+  },
+  // 4. i ** 2
+  () => {
+    const n = randInt(4, 6);
+    const output = rangeArr(0, n).map(i => i * i).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(i ** 2)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">**</span> ${wrap(2, 'num')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i * i) }
+      ])
+    };
+  },
+  // 5. range step 2 with expression
+  () => {
+    const a = randInt(0, 2);
+    const b = randInt(8, 14);
+    const s = 2;
+    const output = rangeArr(a, b, s).map(i => i + 1).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, ${s}):\n    print(i + 1)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(s, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">+</span> ${wrap(1, 'num')})` }
+      ],
+      traceSteps: rangeArr(a, b, s).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i + 1) }
+      ])
+    };
+  },
+  // 6. Countdown with step -2
+  () => {
+    const a = randInt(8, 12);
+    const b = 0;
+    const output = rangeArr(a, b, -2).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, -2):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(-2, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b, -2).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 7. print(i, "x", i, "=", i*i)
+  () => {
+    const a = randInt(1, 3);
+    const b = a + randInt(3, 4);
+    const output = rangeArr(a, b).map(i => `${i} x ${i} = ${i*i}`).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    print(i, "x", i, "=", i * i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>, ${wrap('"x"', 'str')}, <span class="var">i</span>, ${wrap('"="', 'str')}, <span class="var">i</span> <span class="op">*</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: `${i} x ${i} = ${i*i}` }
+      ])
+    };
+  },
+  // 8. range step 3
+  () => {
+    const a = 0;
+    const b = randInt(12, 18);
+    const output = rangeArr(a, b, 3).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, 3):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(3, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b, 3).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  },
+  // 9. i + i
+  () => {
+    const n = randInt(3, 6);
+    const output = rangeArr(0, n).map(i => i + i).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(i + i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span> <span class="op">+</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i + i) }
+      ])
+    };
+  },
+  // 10. countdown print "Пуск!" at end
+  () => {
+    const a = randInt(3, 5);
+    const lines = rangeArr(a, 0, -1).map(i => String(i));
+    lines.push('Пуск!');
+    const output = lines.join('\n');
+    return {
+      code: `for i in range(${a}, 0, -1):\n    print(i)\nprint("Пуск!")`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(0, 'num')}, ${wrap(-1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` },
+        { text: `<span class="fn">print</span>(${wrap('"Пуск!"', 'str')})` }
+      ],
+      traceSteps: [
+        ...rangeArr(a, 0, -1).flatMap(i => [
+          { line: 0, vars: { i } },
+          { line: 1, vars: { i }, prints: String(i) }
+        ]),
+        { line: 2, vars: {}, prints: 'Пуск!' }
+      ]
+    };
+  },
+  // 11. 10 - i
+  () => {
+    const n = randInt(4, 6);
+    const output = rangeArr(0, n).map(i => 10 - i).join('\n');
+    return {
+      code: `for i in range(${n}):\n    print(10 - i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap(10, 'num')} <span class="op">-</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(10 - i) }
+      ])
+    };
+  },
+  // 12. range step -3
+  () => {
+    const a = randInt(15, 20);
+    const b = randInt(0, 3);
+    const output = rangeArr(a, b, -3).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}, -3):\n    print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}, ${wrap(-3, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b, -3).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i) }
+      ])
+    };
+  }
+];
+
+// ----------- LEVEL 3 Templates -----------
+const level3Templates = [
+  // 1. Sum accumulation — print after loop
+  () => {
+    const a = randInt(1, 3);
+    const b = a + randInt(3, 5);
+    let s = 0;
+    const steps = [];
+    for (const i of rangeArr(a, b)) {
+      steps.push({ line: 1, vars: { s, i }, highlights: [] });
+      s += i;
+      steps.push({ line: 2, vars: { s, i } });
+    }
+    steps.push({ line: 3, vars: { s }, prints: String(s) });
+    return {
+      code: `s = 0\nfor i in range(${a}, ${b}):\n    s = s + i\nprint(s)`,
+      output: String(s),
+      codeLines: [
+        { text: `<span class="var">s</span> <span class="op">=</span> ${wrap(0, 'num')}` },
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="var">s</span> <span class="op">=</span> <span class="var">s</span> <span class="op">+</span> <span class="var">i</span>` },
+        { text: `<span class="fn">print</span>(<span class="var">s</span>)` }
+      ],
+      traceSteps: [
+        { line: 0, vars: { s: 0 } },
+        ...(() => {
+          let ss = 0; const r = [];
+          for (const i of rangeArr(a, b)) {
+            r.push({ line: 1, vars: { s: ss, i } });
+            ss += i;
+            r.push({ line: 2, vars: { s: ss, i } });
+          }
+          return r;
+        })(),
+        { line: 3, vars: { s }, prints: String(s) }
+      ]
+    };
+  },
+  // 2. if i % 2 == 0
+  () => {
+    const a = randInt(1, 3);
+    const b = a + randInt(5, 8);
+    const output = rangeArr(a, b).filter(i => i % 2 === 0).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    if i % 2 == 0:\n        print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> ${wrap(2, 'num')} <span class="op">==</span> ${wrap(0, 'num')}:` },
+        { text: `        <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => {
+        const r = [{ line: 0, vars: { i } }, { line: 1, vars: { i } }];
+        if (i % 2 === 0) r.push({ line: 2, vars: { i }, prints: String(i) });
+        return r;
+      })
+    };
+  },
+  // 3. Stars pattern
+  () => {
+    const n = randInt(3, 6);
+    const output = rangeArr(1, n + 1).map(i => '*'.repeat(i)).join('\n');
+    return {
+      code: `for i in range(1, ${n + 1}):\n    print("*" * i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(n + 1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap('"*"', 'str')} <span class="op">*</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(1, n + 1).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: '*'.repeat(i) }
+      ])
+    };
+  },
+  // 4. Product accumulation
+  () => {
+    const a = 1;
+    const b = randInt(4, 6);
+    let p = 1;
+    const steps = [{ line: 0, vars: { p: 1 } }];
+    for (const i of rangeArr(a, b)) {
+      steps.push({ line: 1, vars: { p, i } });
+      p *= i;
+      steps.push({ line: 2, vars: { p, i } });
+    }
+    steps.push({ line: 3, vars: { p }, prints: String(p) });
+    return {
+      code: `p = 1\nfor i in range(${a}, ${b}):\n    p = p * i\nprint(p)`,
+      output: String(p),
+      codeLines: [
+        { text: `<span class="var">p</span> <span class="op">=</span> ${wrap(1, 'num')}` },
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="var">p</span> <span class="op">=</span> <span class="var">p</span> <span class="op">*</span> <span class="var">i</span>` },
+        { text: `<span class="fn">print</span>(<span class="var">p</span>)` }
+      ],
+      traceSteps: steps
+    };
+  },
+  // 5. if i % 2 != 0 (odd)
+  () => {
+    const b = randInt(8, 12);
+    const output = rangeArr(1, b).filter(i => i % 2 !== 0).join('\n');
+    return {
+      code: `for i in range(1, ${b}):\n    if i % 2 != 0:\n        print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> ${wrap(2, 'num')} <span class="op">!=</span> ${wrap(0, 'num')}:` },
+        { text: `        <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(1, b).flatMap(i => {
+        const r = [{ line: 0, vars: { i } }, { line: 1, vars: { i } }];
+        if (i % 2 !== 0) r.push({ line: 2, vars: { i }, prints: String(i) });
+        return r;
+      })
+    };
+  },
+  // 6. Counting with condition
+  () => {
+    const b = randInt(8, 15);
+    let count = 0;
+    const steps = [{ line: 0, vars: { count: 0 } }];
+    for (const i of rangeArr(1, b)) {
+      steps.push({ line: 1, vars: { count, i } });
+      steps.push({ line: 2, vars: { count, i } });
+      if (i % 3 === 0) {
+        count++;
+        steps.push({ line: 3, vars: { count, i } });
+      }
+    }
+    steps.push({ line: 4, vars: { count }, prints: String(count) });
+    return {
+      code: `count = 0\nfor i in range(1, ${b}):\n    if i % 3 == 0:\n        count = count + 1\nprint(count)`,
+      output: String(count),
+      codeLines: [
+        { text: `<span class="var">count</span> <span class="op">=</span> ${wrap(0, 'num')}` },
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> ${wrap(3, 'num')} <span class="op">==</span> ${wrap(0, 'num')}:` },
+        { text: `        <span class="var">count</span> <span class="op">=</span> <span class="var">count</span> <span class="op">+</span> ${wrap(1, 'num')}` },
+        { text: `<span class="fn">print</span>(<span class="var">count</span>)` }
+      ],
+      traceSteps: steps
+    };
+  },
+  // 7. String building with +=
+  () => {
+    const n = randInt(3, 5);
+    const ch = ['#', '@', '!', '+'][randInt(0, 3)];
+    let s = '';
+    const steps = [{ line: 0, vars: { s: '""' } }];
+    for (const i of rangeArr(0, n)) {
+      steps.push({ line: 1, vars: { s: `"${s}"`, i } });
+      s += ch;
+      steps.push({ line: 2, vars: { s: `"${s}"`, i } });
+    }
+    steps.push({ line: 3, vars: { s: `"${s}"` }, prints: s });
+    return {
+      code: `s = ""\nfor i in range(${n}):\n    s = s + "${ch}"\nprint(s)`,
+      output: s,
+      codeLines: [
+        { text: `<span class="var">s</span> <span class="op">=</span> ${wrap('""', 'str')}` },
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="var">s</span> <span class="op">=</span> <span class="var">s</span> <span class="op">+</span> ${wrap(`"${ch}"`, 'str')}` },
+        { text: `<span class="fn">print</span>(<span class="var">s</span>)` }
+      ],
+      traceSteps: steps
+    };
+  },
+  // 8. if i > threshold
+  () => {
+    const a = randInt(1, 3);
+    const b = a + randInt(6, 8);
+    const t = randInt(a + 2, b - 2);
+    const output = rangeArr(a, b).filter(i => i > t).join('\n');
+    return {
+      code: `for i in range(${a}, ${b}):\n    if i > ${t}:\n        print(i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(a, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">></span> ${wrap(t, 'num')}:` },
+        { text: `        <span class="fn">print</span>(<span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(a, b).flatMap(i => {
+        const r = [{ line: 0, vars: { i } }, { line: 1, vars: { i } }];
+        if (i > t) r.push({ line: 2, vars: { i }, prints: String(i) });
+        return r;
+      })
+    };
+  },
+  // 9. Reverse stars
+  () => {
+    const n = randInt(3, 5);
+    const output = rangeArr(n, 0, -1).map(i => '*'.repeat(i)).join('\n');
+    return {
+      code: `for i in range(${n}, 0, -1):\n    print("*" * i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}, ${wrap(0, 'num')}, ${wrap(-1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(${wrap('"*"', 'str')} <span class="op">*</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(n, 0, -1).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: '*'.repeat(i) }
+      ])
+    };
+  },
+  // 10. Max find
+  () => {
+    const values = [randInt(1, 5), randInt(6, 10), randInt(2, 4), randInt(8, 15), randInt(1, 7)];
+    const n = values.length;
+    // We'll simplify — use range to find max of computed values
+    const a = randInt(1, 3);
+    const b = a + randInt(3, 5);
+    const arr = rangeArr(a, b);
+    let mx = arr[0];
+    const steps = [{ line: 0, vars: { mx } }];
+    for (const i of arr) {
+      steps.push({ line: 1, vars: { mx, i } });
+      if (i > mx) {
+        mx = i;
+        steps.push({ line: 2, vars: { mx, i } });
+        steps.push({ line: 3, vars: { mx, i } });
+      }
+    }
+    steps.push({ line: 4, vars: { mx }, prints: String(mx) });
+    // This always gives b-1, let's make it more interesting with i*2 % 7
+    return null; // skip, use below instead
+  },
+  // 10 (replacement). Numbers pattern
+  () => {
+    const n = randInt(3, 5);
+    const output = rangeArr(1, n + 1).map(i => String(i).repeat(i)).join('\n');
+    return {
+      code: `for i in range(1, ${n + 1}):\n    print(str(i) * i)`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(n + 1, 'num')}):` },
+        { text: `    <span class="fn">print</span>(<span class="fn">str</span>(<span class="var">i</span>) <span class="op">*</span> <span class="var">i</span>)` }
+      ],
+      traceSteps: rangeArr(1, n + 1).flatMap(i => [
+        { line: 0, vars: { i } },
+        { line: 1, vars: { i }, prints: String(i).repeat(i) }
+      ])
+    };
+  },
+  // 11. sum with condition
+  () => {
+    const b = randInt(8, 12);
+    let s = 0;
+    const steps = [{ line: 0, vars: { s: 0 } }];
+    for (const i of rangeArr(1, b)) {
+      steps.push({ line: 1, vars: { s, i } });
+      steps.push({ line: 2, vars: { s, i } });
+      if (i % 2 === 0) {
+        s += i;
+        steps.push({ line: 3, vars: { s, i } });
+      }
+    }
+    steps.push({ line: 4, vars: { s }, prints: String(s) });
+    return {
+      code: `s = 0\nfor i in range(1, ${b}):\n    if i % 2 == 0:\n        s = s + i\nprint(s)`,
+      output: String(s),
+      codeLines: [
+        { text: `<span class="var">s</span> <span class="op">=</span> ${wrap(0, 'num')}` },
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(1, 'num')}, ${wrap(b, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> ${wrap(2, 'num')} <span class="op">==</span> ${wrap(0, 'num')}:` },
+        { text: `        <span class="var">s</span> <span class="op">=</span> <span class="var">s</span> <span class="op">+</span> <span class="var">i</span>` },
+        { text: `<span class="fn">print</span>(<span class="var">s</span>)` }
+      ],
+      traceSteps: steps
+    };
+  },
+  // 12. if/else inside loop
+  () => {
+    const n = randInt(4, 7);
+    const output = rangeArr(0, n).map(i => i % 2 === 0 ? `${i} чётное` : `${i} нечётное`).join('\n');
+    return {
+      code: `for i in range(${n}):\n    if i % 2 == 0:\n        print(i, "чётное")\n    else:\n        print(i, "нечётное")`,
+      output,
+      codeLines: [
+        { text: `<span class="kw">for</span> <span class="var">i</span> <span class="kw">in</span> <span class="fn">range</span>(${wrap(n, 'num')}):` },
+        { text: `    <span class="kw">if</span> <span class="var">i</span> <span class="op">%</span> ${wrap(2, 'num')} <span class="op">==</span> ${wrap(0, 'num')}:` },
+        { text: `        <span class="fn">print</span>(<span class="var">i</span>, ${wrap('"чётное"', 'str')})` },
+        { text: `    <span class="kw">else</span>:` },
+        { text: `        <span class="fn">print</span>(<span class="var">i</span>, ${wrap('"нечётное"', 'str')})` }
+      ],
+      traceSteps: rangeArr(0, n).flatMap(i => {
+        const r = [{ line: 0, vars: { i } }, { line: 1, vars: { i } }];
+        if (i % 2 === 0) r.push({ line: 2, vars: { i }, prints: `${i} чётное` });
+        else { r.push({ line: 3, vars: { i } }); r.push({ line: 4, vars: { i }, prints: `${i} нечётное` }); }
+        return r;
+      })
+    };
+  }
+];
+
+function wrap(val, cls) {
+  return `<span class="${cls}">${val}</span>`;
+}
+
+// =============================================
+// GENERATE QUESTIONS
+// =============================================
+
+function generateQuestions(level) {
+  const templates = level === 1 ? level1Templates : level === 2 ? level2Templates : level3Templates;
+  const qs = [];
+  const usedIndices = new Set();
+
+  while (qs.length < TOTAL_QUESTIONS) {
+    let idx;
+    if (usedIndices.size >= templates.length) usedIndices.clear();
+    do { idx = randInt(0, templates.length - 1); } while (usedIndices.has(idx));
+    usedIndices.add(idx);
+
+    const q = templates[idx]();
+    if (!q) continue; // skip null templates
+
+    if (level === 1) {
+      q.type = 'choice';
+      q.choices = generateChoices(q.output);
+    } else {
+      q.type = 'input';
+    }
+    qs.push(q);
+  }
+  return qs;
+}
+
+function generateChoices(correctOutput) {
+  const choices = [correctOutput];
+  const lines = correctOutput.split('\n');
+
+  // Generate plausible wrong answers
+  const wrongGenerators = [
+    // Off by one at start
+    () => {
+      const nums = lines.map(Number);
+      if (nums.some(isNaN)) return lines.map((l, i) => i === 0 ? '' : l).filter(Boolean).join('\n');
+      return nums.map(n => n + 1).join('\n');
+    },
+    // Off by one at end
+    () => {
+      const nums = lines.map(Number);
+      if (nums.some(isNaN)) return [...lines, lines[lines.length - 1]].join('\n');
+      return nums.map(n => n - 1).join('\n');
+    },
+    // Extra element
+    () => {
+      const nums = lines.map(Number);
+      if (nums.some(isNaN)) return [...lines, lines[0]].join('\n');
+      const last = nums[nums.length - 1];
+      const diff = nums.length > 1 ? nums[1] - nums[0] : 1;
+      return [...nums, last + diff].join('\n');
+    },
+    // Missing element
+    () => {
+      if (lines.length <= 1) return lines.join('\n') + '\n' + lines[0];
+      return lines.slice(1).join('\n');
+    },
+    // Reversed
+    () => [...lines].reverse().join('\n'),
+    // Double each
+    () => {
+      const nums = lines.map(Number);
+      if (nums.some(isNaN)) return lines.join('\n');
+      return nums.map(n => n * 2).join('\n');
+    }
+  ];
+
+  while (choices.length < 4) {
+    const gen = wrongGenerators[randInt(0, wrongGenerators.length - 1)];
+    const wrong = gen();
+    if (wrong && wrong !== correctOutput && !choices.includes(wrong) && wrong.trim()) {
+      choices.push(wrong);
+    }
+    // Safety fallback
+    if (choices.length < 4 && Math.random() < 0.1) {
+      const fallback = String(randInt(0, 20));
+      if (!choices.includes(fallback)) choices.push(fallback);
+    }
+  }
+
+  return shuffle(choices.slice(0, 4));
+}
+
+// =============================================
+// SCREEN MANAGEMENT
+// =============================================
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// =============================================
+// GAME LOGIC
+// =============================================
+
+function startGame(level) {
+  currentLevel = level;
+  currentQuestion = 0;
+  score = 0;
+  lives = 3;
+  streak = 0;
+  multiplier = 1;
+  correctCount = 0;
+  wrongCount = 0;
+  answered = false;
+  questions = generateQuestions(level);
+
+  // Update UI
+  const badge = document.getElementById('level-badge');
+  badge.textContent = `Уровень ${level}`;
+  badge.className = 'level-badge l' + level;
+
+  updateTopBar();
+  showScreen('game-screen');
+  showQuestion();
+}
+
+function updateTopBar() {
+  document.getElementById('question-counter').textContent = `${currentQuestion + 1} / ${TOTAL_QUESTIONS}`;
+
+  const heartsEl = document.getElementById('lives');
+  heartsEl.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const span = document.createElement('span');
+    span.className = 'heart' + (i >= lives ? ' lost' : '');
+    span.textContent = '❤️';
+    heartsEl.appendChild(span);
+  }
+
+  document.getElementById('score-display').textContent = score;
+
+  const multEl = document.getElementById('multiplier');
+  multEl.textContent = `×${multiplier}`;
+  multEl.className = 'multiplier' + (multiplier >= 3 ? ' high' : '');
+
+  const pct = (currentQuestion / TOTAL_QUESTIONS) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function showQuestion() {
+  if (currentQuestion >= TOTAL_QUESTIONS || lives <= 0) {
+    showResults();
+    return;
+  }
+
+  answered = false;
+  const q = questions[currentQuestion];
+  updateTopBar();
+
+  // Render code
+  const codeBody = document.getElementById('code-body');
+  codeBody.innerHTML = '';
+  q.codeLines.forEach((line, idx) => {
+    const div = document.createElement('div');
+    div.className = 'code-line';
+    div.id = `code-line-${idx}`;
+    div.innerHTML = `<span class="line-number">${idx + 1}</span><span class="line-content">${line.text}</span>`;
+    codeBody.appendChild(div);
+  });
+
+  // Hide panels
+  document.getElementById('vars-panel').classList.remove('visible');
+  document.getElementById('console-panel').classList.remove('visible');
+  document.getElementById('console-body').innerHTML = '';
+  document.getElementById('vars-list').innerHTML = '';
+
+  // Render answer area
+  const answerArea = document.getElementById('answer-area');
+  answerArea.innerHTML = '';
+
+  document.getElementById('question-text').innerHTML = '<span class="emoji">🤔</span> Что выведет эта программа?';
+
+  if (q.type === 'choice') {
+    const container = document.createElement('div');
+    container.className = 'choices-container';
+    q.choices.forEach(choice => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = choice;
+      btn.onclick = () => handleChoice(btn, choice, q);
+      container.appendChild(btn);
+    });
+    answerArea.appendChild(container);
+  } else {
+    const container = document.createElement('div');
+    container.className = 'input-container';
+
+    const textarea = document.createElement('textarea');
+    textarea.className = 'answer-textarea';
+    textarea.id = 'answer-input';
+    textarea.placeholder = 'Введите вывод программы...\n(каждая строка с новой строки)';
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        handleTextSubmit(q);
+      }
+    });
+    container.appendChild(textarea);
+
+    const hint = document.createElement('div');
+    hint.className = 'input-hint';
+    hint.textContent = '💡 Каждую строку вывода — с новой строки. Ctrl+Enter — отправить.';
+    container.appendChild(hint);
+
+    const btn = document.createElement('button');
+    btn.className = 'btn-submit';
+    btn.textContent = '✅ Проверить';
+    btn.id = 'submit-btn';
+    btn.onclick = () => handleTextSubmit(q);
+    container.appendChild(btn);
+
+    answerArea.appendChild(container);
+    setTimeout(() => textarea.focus(), 100);
+  }
+
+  // Hide feedback
+  document.getElementById('feedback-area').classList.remove('visible');
+}
+
+function handleChoice(btn, chosen, q) {
+  if (answered) return;
+  answered = true;
+
+  // Disable all buttons
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.add('disabled'));
+
+  const isCorrect = normalizeOutput(chosen) === normalizeOutput(q.output);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+
+  if (!isCorrect) {
+    document.querySelectorAll('.choice-btn').forEach(b => {
+      if (normalizeOutput(b.textContent) === normalizeOutput(q.output)) {
+        b.classList.add('correct');
+      }
+    });
+  }
+
+  processAnswer(isCorrect, q);
+}
+
+function handleTextSubmit(q) {
+  if (answered) return;
+  const input = document.getElementById('answer-input');
+  if (!input) return;
+  const userAnswer = input.value.trim();
+  if (!userAnswer) return;
+
+  answered = true;
+  input.disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+
+  const isCorrect = normalizeOutput(userAnswer) === normalizeOutput(q.output);
+  processAnswer(isCorrect, q);
+}
+
+function normalizeOutput(text) {
+  return text.trim().split(/\n/).map(l => l.trim()).filter(l => l.length > 0).join('\n');
+}
+
+function processAnswer(isCorrect, q) {
+  if (isCorrect) {
+    streak++;
+    multiplier = Math.min(streak, 5);
+    const pts = 100 * multiplier;
+    score += pts;
+    correctCount++;
+
+    // Confetti
+    const rect = document.getElementById('game-content').getBoundingClientRect();
+    spawnConfetti(rect.left + rect.width / 2, rect.top + rect.height / 3);
+
+    showFeedback(true, pts, q);
+  } else {
+    streak = 0;
+    multiplier = 1;
+    lives--;
+    wrongCount++;
+
+    // Shake
+    document.getElementById('code-window').classList.add('shake');
+    setTimeout(() => document.getElementById('code-window').classList.remove('shake'), 500);
+
+    showFeedback(false, 0, q);
+  }
+
+  updateTopBar();
+
+  // Run trace animation
+  runTrace(q);
+}
+
+function showFeedback(correct, pts, q) {
+  const feedbackArea = document.getElementById('feedback-area');
+  const banner = document.getElementById('feedback-banner');
+  const expected = document.getElementById('feedback-expected');
+
+  if (correct) {
+    banner.className = 'feedback-banner correct';
+    banner.innerHTML = `✅ Правильно! +${pts} очков` + (multiplier > 1 ? ` (×${multiplier})` : '');
+  } else {
+    banner.className = 'feedback-banner wrong';
+    banner.innerHTML = `❌ Неправильно! −1 ❤️`;
+  }
+
+  expected.innerHTML = `
+    <div class="expected-label">Правильный вывод:</div>
+    <div class="expected-output">${escapeHtml(q.output)}</div>
+  `;
+
+  feedbackArea.classList.add('visible');
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+async function runTrace(q) {
+  const varsPanel = document.getElementById('vars-panel');
+  const consolePanel = document.getElementById('console-panel');
+  const consoleBody = document.getElementById('console-body');
+  const varsList = document.getElementById('vars-list');
+
+  varsPanel.classList.add('visible');
+  consolePanel.classList.add('visible');
+
+  // Clear highlights
+  document.querySelectorAll('.code-line').forEach(l => l.classList.remove('highlight'));
+
+  for (const step of q.traceSteps) {
+    // Highlight current line
+    document.querySelectorAll('.code-line').forEach(l => l.classList.remove('highlight'));
+    const lineEl = document.getElementById(`code-line-${step.line}`);
+    if (lineEl) lineEl.classList.add('highlight');
+
+    // Update variables
+    varsList.innerHTML = '';
+    if (step.vars) {
+      Object.entries(step.vars).forEach(([name, val]) => {
+        const div = document.createElement('div');
+        div.className = 'var-item';
+        div.innerHTML = `<span class="var-name">${name}</span> <span class="var-eq">=</span> <span class="var-val">${val}</span>`;
+        varsList.appendChild(div);
+      });
+    }
+
+    // Print output
+    if (step.prints !== undefined) {
+      const line = document.createElement('div');
+      line.className = 'console-line';
+      line.textContent = step.prints;
+      consoleBody.appendChild(line);
+    }
+
+    await sleep(250);
+  }
+
+  // Remove final highlight after trace
+  setTimeout(() => {
+    document.querySelectorAll('.code-line').forEach(l => l.classList.remove('highlight'));
+  }, 400);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function nextQuestion() {
+  currentQuestion++;
+  if (currentQuestion >= TOTAL_QUESTIONS || lives <= 0) {
+    showResults();
+  } else {
+    showQuestion();
+  }
+}
+
+// =============================================
+// RESULTS
+// =============================================
+
+function showResults() {
+  showScreen('results-screen');
+
+  document.getElementById('results-score').textContent = score;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+
+  // Stars based on score percentage
+  const pct = correctCount / TOTAL_QUESTIONS;
+  let stars = 0;
+  if (pct >= 0.9) stars = 5;
+  else if (pct >= 0.7) stars = 4;
+  else if (pct >= 0.5) stars = 3;
+  else if (pct >= 0.3) stars = 2;
+  else if (pct > 0) stars = 1;
+
+  const starsEl = document.getElementById('results-stars');
+  starsEl.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const span = document.createElement('span');
+    span.className = 'star' + (i >= stars ? ' empty' : '');
+    span.textContent = '⭐';
+    starsEl.appendChild(span);
+  }
+
+  // Message
+  const messages = {
+    5: '🎉 Невероятно! Ты мастер циклов! Python гордится тобой!',
+    4: '💪 Отлично! Ты почти идеален! Ещё чуть-чуть практики!',
+    3: '👍 Хорошо! Ты на верном пути, продолжай тренироваться!',
+    2: '🤔 Неплохое начало. Попробуй пройти уровень ещё раз!',
+    1: '📚 Не сдавайся! Повтори теорию и попробуй снова!',
+    0: '💡 Ничего страшного! Каждый мастер когда-то был учеником.'
+  };
+  document.getElementById('results-message').textContent = messages[stars];
+
+  // Title
+  const titles = {
+    5: '🏆 Великолепно!',
+    4: '🌟 Отличный результат!',
+    3: '👏 Хорошая работа!',
+    2: '💪 Можно лучше!',
+    1: '📖 Нужна практика',
+    0: '🔄 Попробуй ещё!'
+  };
+  document.getElementById('results-title').textContent = titles[stars];
+
+  // Confetti for good results
+  if (stars >= 4) {
+    setTimeout(() => {
+      spawnConfetti(window.innerWidth / 2, window.innerHeight / 3);
+      setTimeout(() => spawnConfetti(window.innerWidth / 3, window.innerHeight / 4), 300);
+      setTimeout(() => spawnConfetti(window.innerWidth * 2 / 3, window.innerHeight / 4), 600);
+    }, 400);
+  }
+}
+</script>
+</body>
+</html>

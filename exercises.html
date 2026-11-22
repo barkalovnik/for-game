@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐍 Циклы for в Python</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f0f4ff;
+            --card-bg: #ffffff;
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --accent-pink: #fd79a8;
+            --accent-orange: #fdcb6e;
+            --accent-green: #00b894;
+            --accent-blue: #74b9ff;
+            --accent-red: #ff7675;
+            --accent-teal: #81ecec;
+            --text: #2d3436;
+            --text-light: #636e72;
+            --terminal-bg: #1e1e2e;
+            --terminal-text: #cdd6f4;
+            --terminal-green: #a6e3a1;
+            --hint-bg: #ffeaa7;
+            --solution-bg: #dfe6e9;
+            --shadow: 0 4px 20px rgba(108, 92, 231, 0.12);
+            --shadow-hover: 0 8px 32px rgba(108, 92, 231, 0.22);
+            --radius: 18px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========== HEADER ========== */
+        .hero {
+            background: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 40%, #fd79a8 100%);
+            padding: 60px 20px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: drift 60s linear infinite;
+        }
+        @keyframes drift {
+            to { transform: translate(30px, 30px); }
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.15);
+        }
+        .hero p {
+            font-size: clamp(1rem, 2.5vw, 1.15rem);
+            color: rgba(255,255,255,0.92);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 500;
+        }
+
+        /* ========== CONTAINER ========== */
+        .container {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* ========== CHEATSHEET ========== */
+        .cheatsheet {
+            background: linear-gradient(135deg, #dfe6e9 0%, #ffeaa7 100%);
+            border-radius: var(--radius);
+            padding: 32px;
+            margin: 36px auto;
+            max-width: 880px;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+        .cheatsheet::after {
+            content: '📚';
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 2.4rem;
+            opacity: 0.35;
+        }
+        .cheatsheet h2 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin-bottom: 18px;
+            color: var(--primary);
+        }
+        .cheatsheet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+        }
+        .cheatsheet-item {
+            background: rgba(255,255,255,0.75);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            backdrop-filter: blur(4px);
+        }
+        .cheatsheet-item code {
+            display: block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+        .cheatsheet-item span {
+            font-size: 0.88rem;
+            color: var(--text-light);
+        }
+
+        /* ========== LEVEL DIVIDER ========== */
+        .level-divider {
+            text-align: center;
+            margin: 48px 0 28px;
+            position: relative;
+        }
+        .level-divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--primary-light), transparent);
+        }
+        .level-badge {
+            display: inline-block;
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.05rem;
+            padding: 10px 28px;
+            border-radius: 50px;
+            box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 0;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow);
+            transition: transform 0.25s cubic-bezier(.4,0,.2,1), box-shadow 0.25s cubic-bezier(.4,0,.2,1);
+            overflow: hidden;
+            border: 2px solid transparent;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        .card-accent-1 { border-top: 4px solid var(--accent-blue); }
+        .card-accent-2 { border-top: 4px solid var(--accent-green); }
+        .card-accent-3 { border-top: 4px solid var(--accent-orange); }
+        .card-accent-4 { border-top: 4px solid var(--accent-pink); }
+        .card-accent-5 { border-top: 4px solid var(--accent-teal); }
+        .card-accent-6 { border-top: 4px solid var(--primary-light); }
+        .card-accent-7 { border-top: 4px solid var(--accent-red); }
+        .card-accent-8 { border-top: 4px solid #55efc4; }
+        .card-accent-9 { border-top: 4px solid #fab1a0; }
+        .card-accent-10 { border-top: 4px solid #74b9ff; }
+        .card-accent-11 { border-top: 4px solid #e17055; }
+        .card-accent-12 { border-top: 4px solid #6c5ce7; }
+
+        .card-body {
+            padding: 28px 28px 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+        .card-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary), var(--accent-pink));
+            color: #fff;
+            font-weight: 800;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text);
+            flex: 1;
+        }
+        .card-stars {
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        .card-desc {
+            font-size: 1rem;
+            color: var(--text-light);
+            margin-bottom: 18px;
+            line-height: 1.65;
+        }
+
+        /* ========== TERMINAL ========== */
+        .terminal {
+            background: var(--terminal-bg);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 18px;
+        }
+        .terminal-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.05);
+        }
+        .terminal-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+        }
+        .terminal-dot.red { background: #ff5f56; }
+        .terminal-dot.yellow { background: #ffbd2e; }
+        .terminal-dot.green { background: #27c93f; }
+        .terminal-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.35);
+            margin-left: 6px;
+        }
+        .terminal-body {
+            padding: 14px 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.88rem;
+            color: var(--terminal-green);
+            line-height: 1.65;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* ========== BUTTONS ========== */
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-hint {
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            color: #6c5100;
+        }
+        .btn-hint:hover {
+            box-shadow: 0 4px 14px rgba(253,203,110,0.5);
+        }
+        .btn-solution {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: #fff;
+        }
+        .btn-solution:hover {
+            box-shadow: 0 4px 14px rgba(108,92,231,0.4);
+        }
+
+        /* ========== COLLAPSIBLE CONTENT ========== */
+        .collapsible {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(.4,0,.2,1), padding 0.3s ease, margin 0.3s ease;
+        }
+        .collapsible.open {
+            max-height: 600px;
+        }
+        .hint-box {
+            background: linear-gradient(135deg, #fff9db, #ffeaa7);
+            border-radius: var(--radius-sm);
+            padding: 0;
+            margin-top: 0;
+            font-size: 0.95rem;
+            color: #6c5100;
+            line-height: 1.6;
+        }
+        .hint-box.open {
+            padding: 14px 18px;
+            margin-top: 14px;
+        }
+        .solution-box {
+            margin-top: 0;
+        }
+        .solution-box.open {
+            margin-top: 14px;
+        }
+        .solution-box .terminal {
+            margin-bottom: 0;
+        }
+        .solution-box .terminal-body {
+            color: var(--terminal-text);
+        }
+        .solution-box .terminal-body .kw { color: #cba6f7; }
+        .solution-box .terminal-body .fn { color: #89b4fa; }
+        .solution-box .terminal-body .str { color: #a6e3a1; }
+        .solution-box .terminal-body .num { color: #fab387; }
+        .solution-box .terminal-body .op { color: #89dceb; }
+        .solution-box .terminal-body .cmt { color: #6c7086; font-style: italic; }
+
+        /* ========== FOOTER ========== */
+        .footer-section {
+            text-align: center;
+            padding: 50px 20px 60px;
+        }
+        .motivate {
+            background: linear-gradient(135deg, #00b894, #55efc4);
+            border-radius: var(--radius);
+            padding: 40px 28px;
+            margin-bottom: 28px;
+            max-width: 880px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: var(--shadow);
+        }
+        .motivate h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .motivate p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.05rem;
+            font-weight: 500;
+        }
+        .game-links {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 22px;
+        }
+        .game-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            backdrop-filter: blur(4px);
+            transition: all 0.25s ease;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .game-link:hover {
+            background: rgba(255,255,255,0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 600px) {
+            .hero {
+                padding: 40px 16px 36px;
+            }
+            .card-body {
+                padding: 20px 18px 18px;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .card-title {
+                font-size: 1.15rem;
+            }
+            .cheatsheet {
+                padding: 22px 18px;
+            }
+            .cheatsheet-grid {
+                grid-template-columns: 1fr;
+            }
+            .motivate {
+                padding: 28px 20px;
+            }
+            .btn {
+                padding: 9px 16px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+        .card {
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .card:nth-child(1) { animation-delay: 0.05s; }
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.15s; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<header class="hero">
+    <div class="hero-content">
+        <h1>🐍 Циклы for в Python</h1>
+        <p>Цикл <code style="background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:6px;font-family:'JetBrains Mono',monospace;">for i in range()</code> позволяет повторять действия нужное количество раз. Ты указываешь, сколько раз повторить, а Python делает остальное. Пройди 12 заданий — от простого к сложному — и стань мастером циклов! 🚀</p>
+        <div style="display:flex;gap:12px;justify-content:center;margin-top:18px;flex-wrap:wrap;">
+            <a href="index.html" style="color:#fff;background:rgba(255,255,255,0.2);padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.9rem;font-weight:600;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);transition:0.2s;">🏠 Меню урока</a>
+            <a href="loop-game.html" style="color:#fff;background:rgba(255,255,255,0.2);padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.9rem;font-weight:600;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);transition:0.2s;">🎮 Игра «Цикломат»</a>
+            <a href="gravity-golf.html" style="color:#fff;background:rgba(255,255,255,0.2);padding:8px 16px;border-radius:20px;text-decoration:none;font-size:0.9rem;font-weight:600;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.3);transition:0.2s;">🌌 Физическая игра</a>
+        </div>
+    </div>
+</header>
+
+<!-- ==================== CHEATSHEET ==================== -->
+<div class="container">
+    <div class="cheatsheet">
+        <h2>📚 Шпаргалка по range()</h2>
+        <div class="cheatsheet-grid">
+            <div class="cheatsheet-item">
+                <code>range(stop)</code>
+                <span>Числа от <strong>0</strong> до <strong>stop − 1</strong><br>Пример: range(5) → 0, 1, 2, 3, 4</span>
+            </div>
+            <div class="cheatsheet-item">
+                <code>range(start, stop)</code>
+                <span>Числа от <strong>start</strong> до <strong>stop − 1</strong><br>Пример: range(2, 6) → 2, 3, 4, 5</span>
+            </div>
+            <div class="cheatsheet-item">
+                <code>range(start, stop, step)</code>
+                <span>От <strong>start</strong> до <strong>stop − 1</strong> с шагом <strong>step</strong><br>Пример: range(1, 10, 2) → 1, 3, 5, 7, 9</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LEVEL 1 ==================== -->
+    <div class="level-divider">
+        <span class="level-badge">🌱 Уровень 1 — Знакомство с range()</span>
+    </div>
+
+    <!-- Task 1 -->
+    <div class="card card-accent-1">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">1</span>
+                <span class="card-title">🚶 Первые шаги</span>
+                <span class="card-stars">⭐</span>
+            </div>
+            <p class="card-desc">Выведи числа от 0 до 4 с помощью цикла <code>for i in range(5)</code>. Каждое число — на новой строке.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">0
+1
+2
+3
+4</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">range(5) создаёт последовательность чисел: 0, 1, 2, 3, 4. Переменная <code>i</code> принимает каждое значение по очереди.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):
+    <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 2 -->
+    <div class="card card-accent-2">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">2</span>
+                <span class="card-title">🔁 Повторялка</span>
+                <span class="card-stars">⭐</span>
+            </div>
+            <p class="card-desc">Выведи слово <code>"Привет!"</code> ровно 5 раз. Каждое — на новой строке.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">Привет!
+Привет!
+Привет!
+Привет!
+Привет!</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Переменную <code>i</code> не обязательно использовать внутри цикла. Можно просто написать <code>print("Привет!")</code> в теле цикла.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">5</span>):
+    <span class="fn">print</span>(<span class="str">"Привет!"</span>)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 3 -->
+    <div class="card card-accent-3">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">3</span>
+                <span class="card-title">🎯 От и до</span>
+                <span class="card-stars">⭐</span>
+            </div>
+            <p class="card-desc">Выведи числа от 1 до 10 (включительно). Каждое число — на новой строке.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box"><code>range(1, 11)</code> начинает с 1 и заканчивает до 11 (не включая 11). Значит, получится: 1, 2, 3, …, 10.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):
+    <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LEVEL 2 ==================== -->
+    <div class="level-divider">
+        <span class="level-badge">⚡ Уровень 2 — Параметры range()</span>
+    </div>
+
+    <!-- Task 4 -->
+    <div class="card card-accent-4">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">4</span>
+                <span class="card-title">✌️ Чётный счёт</span>
+                <span class="card-stars">⭐⭐</span>
+            </div>
+            <p class="card-desc">Выведи все чётные числа от 2 до 20 (включительно). Каждое — на новой строке.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">2
+4
+6
+8
+10
+12
+14
+16
+18
+20</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Третий параметр <code>range</code> — это шаг. <code>range(2, 21, 2)</code> начинает с 2, заканчивает до 21 и прыгает через 2.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">2</span>, <span class="num">21</span>, <span class="num">2</span>):
+    <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 5 -->
+    <div class="card card-accent-5">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">5</span>
+                <span class="card-title">⏪ Обратный отсчёт</span>
+                <span class="card-stars">⭐⭐</span>
+            </div>
+            <p class="card-desc">Выведи обратный отсчёт от 10 до 1. Как перед запуском ракеты! 🚀</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">10
+9
+8
+7
+6
+5
+4
+3
+2
+1</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box"><code>range(10, 0, -1)</code> считает назад: начинает с 10 и идёт до 1 (не включая 0), уменьшаясь на 1.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">10</span>, <span class="num">0</span>, <span class="num">-1</span>):
+    <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 6 -->
+    <div class="card card-accent-6">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">6</span>
+                <span class="card-title">🦘 Тройной прыжок</span>
+                <span class="card-stars">⭐⭐</span>
+            </div>
+            <p class="card-desc">Выведи числа, кратные 3, от 3 до 30 (включительно). Каждое число — на новой строке.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">3
+6
+9
+12
+15
+18
+21
+24
+27
+30</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box"><code>range(3, 31, 3)</code> — начинаем с 3, идём до 31 (не включая), шаг 3. Получаем: 3, 6, 9, …, 30.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">3</span>, <span class="num">31</span>, <span class="num">3</span>):
+    <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LEVEL 3 ==================== -->
+    <div class="level-divider">
+        <span class="level-badge">🔥 Уровень 3 — Цикл + переменные и вычисления</span>
+    </div>
+
+    <!-- Task 7 -->
+    <div class="card card-accent-7">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">7</span>
+                <span class="card-title">➕ Сумматор</span>
+                <span class="card-stars">⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Запроси у пользователя число <code>N</code> и посчитай сумму всех чисел от 1 до N. Выведи результат.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод (N = 5)</span>
+                </div>
+                <div class="terminal-body">Введите число: 5
+Сумма чисел от 1 до 5 = 15</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Создай переменную <code>summa = 0</code> перед циклом. Внутри цикла <code>for i in range(1, N+1)</code> прибавляй <code>i</code> к <code>summa</code>.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body">N = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Введите число: "</span>))
+summa = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, N + <span class="num">1</span>):
+    summa = summa + i
+<span class="fn">print</span>(<span class="str">"Сумма чисел от 1 до"</span>, N, <span class="str">"="</span>, summa)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 8 -->
+    <div class="card card-accent-8">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">8</span>
+                <span class="card-title">✖️ Таблица умножения</span>
+                <span class="card-stars">⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Запроси у пользователя число и выведи его таблицу умножения от 1 до 10.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод (число = 7)</span>
+                </div>
+                <div class="terminal-body">Введите число: 7
+7 x 1 = 7
+7 x 2 = 14
+7 x 3 = 21
+7 x 4 = 28
+7 x 5 = 35
+7 x 6 = 42
+7 x 7 = 49
+7 x 8 = 56
+7 x 9 = 63
+7 x 10 = 70</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Используй <code>f-строку</code> или конкатенацию для красивого вывода. Внутри цикла вычисляй <code>n * i</code> и выводи результат.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body">n = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Введите число: "</span>))
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):
+    <span class="fn">print</span>(n, <span class="str">"x"</span>, i, <span class="str">"="</span>, n * i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 9 -->
+    <div class="card card-accent-9">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">9</span>
+                <span class="card-title">📐 Квадраты</span>
+                <span class="card-stars">⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Выведи квадраты чисел от 1 до 10 в формате <code>"1² = 1"</code>, <code>"2² = 4"</code> и т. д.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод</span>
+                </div>
+                <div class="terminal-body">1² = 1
+2² = 4
+3² = 9
+4² = 16
+5² = 25
+6² = 36
+7² = 49
+8² = 64
+9² = 81
+10² = 100</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box"><code>i ** 2</code> даёт квадрат числа <code>i</code>. Для символа ² можно просто вставить его в строку или использовать <code>f-строку</code>.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">11</span>):
+    <span class="fn">print</span>(<span class="str">f"</span>{i}<span class="str">² = </span>{i ** <span class="num">2</span>}<span class="str">"</span>)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== LEVEL 4 ==================== -->
+    <div class="level-divider">
+        <span class="level-badge">🏆 Уровень 4 — Цикл + условия</span>
+    </div>
+
+    <!-- Task 10 -->
+    <div class="card card-accent-10">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">10</span>
+                <span class="card-title">👏 Хлоп!</span>
+                <span class="card-stars">⭐⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Выведи числа от 1 до 30, но числа, кратные 5, замени на слово <code>"Хлоп!"</code>.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод (фрагмент)</span>
+                </div>
+                <div class="terminal-body">1
+2
+3
+4
+Хлоп!
+6
+7
+8
+9
+Хлоп!
+...
+29
+Хлоп!</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Проверяй остаток от деления: <code>if i % 5 == 0</code>. Если делится на 5 — выводи <code>"Хлоп!"</code>, иначе (<code>else</code>) — выводи число <code>i</code>.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body"><span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="num">31</span>):
+    <span class="kw">if</span> i % <span class="num">5</span> <span class="op">==</span> <span class="num">0</span>:
+        <span class="fn">print</span>(<span class="str">"Хлоп!"</span>)
+    <span class="kw">else</span>:
+        <span class="fn">print</span>(i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 11 -->
+    <div class="card card-accent-11">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">11</span>
+                <span class="card-title">🔺 Пирамида</span>
+                <span class="card-stars">⭐⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Запроси число <code>N</code> и нарисуй прямоугольный треугольник из звёздочек высотой N строк. В первой строке — 1 звёздочка, во второй — 2 и т. д.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод (N = 5)</span>
+                </div>
+                <div class="terminal-body">Введите число: 5
+*
+**
+***
+****
+*****</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Используй <code>print("*" * i)</code>. Умножение строки на число повторяет её. Цикл <code>for i in range(1, N+1)</code> даст нужное количество строк.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body">N = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Введите число: "</span>))
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, N + <span class="num">1</span>):
+    <span class="fn">print</span>(<span class="str">"*"</span> * i)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Task 12 -->
+    <div class="card card-accent-12">
+        <div class="card-body">
+            <div class="card-header">
+                <span class="card-number">12</span>
+                <span class="card-title">🎲 Факториал</span>
+                <span class="card-stars">⭐⭐⭐⭐</span>
+            </div>
+            <p class="card-desc">Запроси у пользователя число <code>N</code> и вычисли <code>N!</code> (факториал). Факториал — это произведение всех чисел от 1 до N. Например: 5! = 1 × 2 × 3 × 4 × 5 = 120.</p>
+            <div class="terminal">
+                <div class="terminal-bar">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-label">Ожидаемый вывод (N = 5)</span>
+                </div>
+                <div class="terminal-body">Введите число: 5
+Факториал 5! = 120</div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-hint" onclick="toggle(this, 'hint')">Подсказка 💡</button>
+                <button class="btn btn-solution" onclick="toggle(this, 'solution')">Показать решение 🔑</button>
+            </div>
+            <div class="collapsible hint-box">Создай переменную <code>result = 1</code> перед циклом. Внутри цикла <code>for i in range(1, N+1)</code> умножай: <code>result = result * i</code>.</div>
+            <div class="collapsible solution-box">
+                <div class="terminal">
+                    <div class="terminal-bar">
+                        <span class="terminal-dot red"></span>
+                        <span class="terminal-dot yellow"></span>
+                        <span class="terminal-dot green"></span>
+                        <span class="terminal-label">Решение</span>
+                    </div>
+                    <div class="terminal-body">N = <span class="fn">int</span>(<span class="fn">input</span>(<span class="str">"Введите число: "</span>))
+result = <span class="num">1</span>
+<span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, N + <span class="num">1</span>):
+    result = result * i
+<span class="fn">print</span>(<span class="str">"Факториал"</span>, <span class="str">f"</span>{N}<span class="str">! ="</span>, result)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /.container -->
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer-section">
+    <div class="motivate">
+        <h2>🎉 Ты справишься!</h2>
+        <p>Каждый программист когда-то начинал с первого цикла. Решай задания по порядку, не бойся ошибаться — ошибки помогают учиться! Когда решишь все 12, попробуй наши игры:</p>
+        <div class="game-links">
+            <a href="loop-game.html" class="game-link">🎮 Игра «Цикломат»</a>
+            <a href="gravity-golf.html" class="game-link">🌌 «Гравитационный Гольф»</a>
+            <a href="index.html" class="game-link" style="background: rgba(255,255,255,0.15);">🏠 Меню урока</a>
+        </div>
+    </div>
+</div>
+
+<footer class="page-footer">
+    <p>🐍 Python Junior — Циклы for • Сделано с 💜</p>
+</footer>
+
+<script>
+    function toggle(button, type) {
+        const card = button.closest('.card-body');
+        const target = type === 'hint'
+            ? card.querySelector('.hint-box')
+            : card.querySelector('.solution-box');
+
+        if (target.classList.contains('open')) {
+            target.classList.remove('open');
+            if (type === 'hint') {
+                button.textContent = 'Подсказка 💡';
+            } else {
+                button.textContent = 'Показать решение 🔑';
+            }
+        } else {
+            target.classList.add('open');
+            if (type === 'hint') {
+                button.textContent = 'Скрыть подсказку 💡';
+            } else {
+                button.textContent = 'Скрыть решение 🔑';
+            }
+        }
+    }
+
+    // Animate cards on scroll
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.animationPlayState = 'running';
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.card').forEach(card => {
+        card.style.animationPlayState = 'paused';
+        observer.observe(card);
+    });
+</script>
+</body>
+</html>
